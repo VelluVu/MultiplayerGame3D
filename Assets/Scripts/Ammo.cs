@@ -7,26 +7,27 @@ public class Ammo : MonoBehaviour {
     Rigidbody ammoRb;
     float forcez;
     float projectileLifeTime;
+    bool hitT;
 
     private void Start()
     {
-
+        hitT = false;
         projectileLifeTime = 5f;
-
-        /*ammoRb = gameObject.GetComponent<Rigidbody>();
-
-        ammoRb.AddRelativeForce(Vector3.forward * forcez, ForceMode.Impulse);
-        */
+      
         Destroy(gameObject, projectileLifeTime);
     }
-    /*
-    public void SetForceZ(float force)
-    {
-        forcez = force;
-    }*/
-
+    
     private void OnCollisionEnter(Collision collision)
     {
-        //Destroy(gameObject);
+        
+
+        if (collision.collider.CompareTag("Player") && !hitT)
+        {
+            collision.gameObject.GetComponent<PlayerHP>().takeDamage(10);
+            Debug.Log("hit");
+            hitT = true;
+            Destroy(gameObject);
+            
+        }       
     }
 }

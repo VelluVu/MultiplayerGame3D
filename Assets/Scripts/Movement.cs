@@ -9,16 +9,17 @@ public class Movement : Photon.MonoBehaviour {
     float jumpForce;
     float bulletforceZ;
     float nextShot;
-
+    public Vector3 startPos;
     bool readyToFire;
     bool onGround;
     Rigidbody rb;
 
     public GameObject gunRotator;
-    public Ammo ammo;
+    public GameObject ammo;
     public Transform firePoint;
-
     public Camera myCam;
+    public PlayerHP myHP;
+    public Canvas myInfoCanvas;
 
     void Start() {
         readyToFire = true;
@@ -27,24 +28,33 @@ public class Movement : Photon.MonoBehaviour {
         rotationSpeed = 5f;
         rb = gameObject.GetComponent<Rigidbody>();
         bulletforceZ = 15f;
+        startPos = transform.position;
 
         if (photonView.isMine)
         {
 
+            myHP.InitHealth(100);
             myCam.enabled = true;
-
+            myCam.tag = "MyCam";
+            //gameObject.tag = "Me";
         }
+        
 
     }
 
     private void Update()
     {
+       
         if (photonView.isMine)
-        {
-            PlayerMove();
+        {        
+            myHP.UpdateHealth();
             Jump();
+            PlayerMove();
             Shoot();
         }
+       
+        myInfoCanvas.transform.LookAt(GameObject.FindGameObjectWithTag("MyCam").transform);
+
     }
 
     private void Shoot()
@@ -54,11 +64,10 @@ public class Movement : Photon.MonoBehaviour {
         {
 
             nextShot = Time.time + 1;
-            Ammo ammoInstance = Instantiate(ammo, firePoint.position, firePoint.rotation) as Ammo;
+            GameObject ammoInstance = Instantiate(ammo, firePoint.position, Quaternion.identity);
             ammoInstance.GetComponent<Rigidbody>().AddForce(firePoint.transform.forward * 10, ForceMode.Impulse);
-            readyToFire = false;
             photonView.RPC("ShootBall", PhotonTargets.Others, firePoint.transform.position, firePoint.transform.forward);
-
+            readyToFire = false;
 
         }
         else
@@ -122,15 +131,16 @@ public class Movement : Photon.MonoBehaviour {
         }
     }
 
-
     [PunRPC]
     void ShootBall(Vector3 location, Vector3 forward)
     {
 
-        Ammo ammoInstance = Instantiate(ammo, location, Quaternion.identity) as Ammo;
-        ammoInstance.GetComponent<Rigidbody>().AddForce(forward * 10, ForceMode.Impulse);
+        GameObject ammoInstanc = Instantiate(ammo, location, Quaternion.identity);
+        ammoInstanc.GetComponent<Rigidbody>().AddForce(forward * 10, ForceMode.Impulse);
 
     }
+
+
 
     /*
       Kotitehtävä:

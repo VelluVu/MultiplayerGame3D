@@ -80,7 +80,7 @@ public class NetWorkManager : Photon.PunBehaviour {
         // Instansioi pelaaja, huom Network Pelaaja.
 
         GameObject player = PhotonNetwork.Instantiate("PlayerBox", new Vector3(0, 0.5f, 0), Quaternion.identity, 0);
-
+        
     }
 
     private void OnPlayerDisconnected(NetworkCharacter player)
